@@ -9,15 +9,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigDecimal;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.RepeatedTest;
-import org.junit.jupiter.api.RepetitionInfo;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import com.antonio.junit5.exceptions.DineroInsuficienteException;
 
@@ -26,7 +20,7 @@ public class CuentaTest {
 
     @BeforeEach
     void initMetodoTest() {
-        this.cuenta = new Cuenta("Andrés", new BigDecimal(123.000));
+        this.cuenta = new Cuenta("Andrés", new BigDecimal(1000.12345));
         System.out.println("Iniciando el método");
     }
 
@@ -52,7 +46,7 @@ public class CuentaTest {
         @Test
         void testSaldoCuenta() {
 
-            assertEquals(123.0, cuenta.getSaldo().doubleValue());
+            assertEquals(1000.12345, cuenta.getSaldo().doubleValue());
             assertFalse(cuenta.getSaldo().compareTo(BigDecimal.ZERO) < 0);
             assertTrue(cuenta.getSaldo().compareTo(BigDecimal.ZERO) > 0);
         }
@@ -83,8 +77,8 @@ public class CuentaTest {
             cuenta.credito(new BigDecimal(100));
 
             assertNotNull(cuenta.getSaldo());
-            assertEquals(223, cuenta.getSaldo().intValue());
-            assertEquals("223", cuenta.getSaldo().toPlainString());
+            assertEquals(1100, cuenta.getSaldo().intValue());
+            assertEquals("1100.1234500000000480213202536106109619140625", cuenta.getSaldo().toPlainString());
         }
 
         @Test
@@ -149,7 +143,15 @@ public class CuentaTest {
         }
         cuenta.debito(new BigDecimal(100));
         assertNotNull(cuenta.getSaldo());
-        assertEquals(23, cuenta.getSaldo().intValue());
-        assertEquals("23", cuenta.getSaldo().toPlainString());
+        assertEquals(900, cuenta.getSaldo().intValue());
+    }
+
+    @ParameterizedTest(name = "Numero {index} ejecutando con valor {0} - {argumentsWithNames}")
+    @ValueSource(strings = { "100", "200", "300", "500", "700", "1000.12346" })
+    void testDebitoCuentaParametrizado(String monto) {
+        cuenta.debito(new BigDecimal(monto));
+
+        assertNotNull(cuenta.getSaldo());
+        assertTrue(cuenta.getSaldo().compareTo(BigDecimal.ZERO) > 0);
     }
 }
