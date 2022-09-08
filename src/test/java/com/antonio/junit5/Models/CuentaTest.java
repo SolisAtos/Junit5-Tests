@@ -8,9 +8,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import com.antonio.junit5.exceptions.DineroInsuficienteException;
@@ -153,5 +157,28 @@ public class CuentaTest {
 
         assertNotNull(cuenta.getSaldo());
         assertTrue(cuenta.getSaldo().compareTo(BigDecimal.ZERO) > 0);
+    }
+
+    @ParameterizedTest(name = "Numero {index} ejecutando con valor {0} - {argumentsWithNames}")
+    @CsvSource({ "1,100", "2,200", "3,300", "4,500", "5,700", "6,1000.12346" })
+    void testDebitoCuentaCsvSource(String index, String monto) {
+        System.out.println(index + " -> " + monto);
+        cuenta.debito(new BigDecimal(monto));
+
+        assertNotNull(cuenta.getSaldo());
+        assertTrue(cuenta.getSaldo().compareTo(BigDecimal.ZERO) > 0);
+    }
+
+    @ParameterizedTest(name = "Numero {index} ejecutando con valor {0} - {argumentsWithNames}")
+    @MethodSource("montoList")
+    void testDebitoCuentaMethodSource(String monto) {
+        cuenta.debito(new BigDecimal(monto));
+
+        assertNotNull(cuenta.getSaldo());
+        assertTrue(cuenta.getSaldo().compareTo(BigDecimal.ZERO) > 0);
+    }
+
+    static private List<String> montoList() {
+        return Arrays.asList("100", "200", "300", "500", "700", "1000.12346");
     }
 }
